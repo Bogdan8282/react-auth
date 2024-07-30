@@ -1,42 +1,45 @@
 import React, { useState } from "react";
 import axios from "../utils/axios";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post("/register", { email, password });
-      console.log(response.data);
+      if (response.status === 201) {
+        navigate("/"); // Redirect to home page after successful registration
+      }
     } catch (error) {
-      console.error("Error registering", error);
-      setError(error.response.data);
+      setError(error.response.data || "Registration failed");
     }
   };
 
   return (
-    <form onSubmit={handleRegister}>
-      <h1>Register</h1>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <button type="submit">Register</button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-    </form>
+    <div>
+      <h2>Register</h2>
+      <form onSubmit={handleRegister}>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+        />
+        <button type="submit">Register</button>
+        {error && <p>{error}</p>}
+      </form>
+    </div>
   );
 };
 

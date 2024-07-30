@@ -2,29 +2,45 @@ import React, { useState, useEffect } from "react";
 import axios from "../utils/axios";
 
 const Home = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Перевірка, чи увійшов користувач в аккаунт
-    // Тут можна використовувати токен або іншу перевірку аутентифікації
     const checkAuth = async () => {
       try {
-        // Приклад перевірки аутентифікації
-        const response = await axios.get("/check-auth"); // Додайте відповідний маршрут на сервері
-        if (response.status === 200) {
-          setLoggedIn(true);
+        const token = localStorage.getItem("token");
+        if (token) {
+          const response = await axios.get("/check-auth", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.data.authenticated) {
+            setAuthenticated(true);
+            setUser(response.data.user);
+          }
         }
       } catch (error) {
-        setLoggedIn(false);
+        console.error("Error checking auth", error);
       }
     };
-
     checkAuth();
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setAuthenticated(false);
+    setUser(null);
+  };
+
   return (
     <div>
-      <h1>Welcome to the {loggedIn ? "Logged In" : "Guest"} Home Page</h1>
+      {authenticated ? (
+        <div>
+          <h1>Welcome, {user ? user.email : "User"}</h1>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
+      ) : (
+        <h1>Please log in or register</h1>
+      )}
     </div>
   );
 };
