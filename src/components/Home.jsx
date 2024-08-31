@@ -1,45 +1,59 @@
 import React, { useState, useEffect } from "react";
 import axios from "../utils/axios";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  const [authenticated, setAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (token) {
-          const response = await axios.get("/check-auth", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (response.data.authenticated) {
-            setAuthenticated(true);
-            setUser(response.data.user);
-          }
-        }
-      } catch (error) {
-        console.error("Error checking auth", error);
-      }
-    };
-    checkAuth();
-  }, []);
+  const checkAuth = async () => {
+    try {
+      const response = await axios.get("/check-auth", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setUser(response.data.user);
+    } catch (error) {
+      console.error("Error checking auth", error);
+      navigate("/login");
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setAuthenticated(false);
-    setUser(null);
+    navigate("/login");
   };
+
+  const handleDeleteAccount = async () => {
+    try {
+      await axios.delete("/delete-account", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      localStorage.removeItem("token");
+      navigate("/register");
+    } catch (error) {
+      console.error("Error deleting account", error);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   return (
     <div>
-      {authenticated ? (
+      <h2>Home</h2>
+      {user ? (
         <div>
-          <h1>Welcome, {user ? user.email : "User"}</h1>
+          <p>Welcome, {user.email}</p>
           <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleDeleteAccount}>Delete Account</button>
         </div>
       ) : (
-        <h1>Please log in or register</h1>
+        <p>Loading...</p>
       )}
     </div>
   );

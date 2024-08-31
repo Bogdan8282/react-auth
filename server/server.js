@@ -37,7 +37,12 @@ app.post("/api/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ email, password: hashedPassword });
     await user.save();
-    res.status(201).send("User registered");
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.status(201).json({ message: "User registered", token });
   } catch (error) {
     console.error(error);
     res.status(400).send(error.message);
@@ -86,6 +91,27 @@ app.get("/api/check-auth", (req, res) => {
   } else {
     res.status(401).json({ authenticated: false });
   }
+});
+
+app.delete("/api/delete-account", async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      await User.findByIdAndDelete(decoded.userId);
+      res.status(200).json({ message: "Account deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting account" });
+    }
+  });
 });
 
 app.listen(port, () => {

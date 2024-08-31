@@ -12,11 +12,10 @@ const Register = () => {
     e.preventDefault();
     try {
       const response = await axios.post("/register", { email, password });
-      if (response.status === 201) {
-        navigate("/"); // Redirect to home page after successful registration
-      }
+      localStorage.setItem("token", response.data.token);
+      navigate("/");
     } catch (error) {
-      setError(error.response.data || "Registration failed");
+      setError(error.response.data);
     }
   };
 
@@ -29,16 +28,18 @@ const Register = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
+          required
         />
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
+          required
         />
         <button type="submit">Register</button>
-        {error && <p>{error}</p>}
       </form>
+      {error && <p>{error}</p>}
     </div>
   );
 };
