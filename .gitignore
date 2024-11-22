@@ -11,11 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
-server/.env
-<<<<<<< HEAD
-package-lock.json
-=======
->>>>>>> c4f3df6db72cde81fa94afb116801004a0489691
+**/.env
+**/package-lock.json
 
 # Editor directories and files
 .vscode/*
