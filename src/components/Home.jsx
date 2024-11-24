@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "../utils/axios";
 import { useNavigate } from "react-router-dom";
+import Header from "./Header.jsx";
 
 const Home = () => {
   const [user, setUser] = useState(null);
@@ -40,6 +41,7 @@ const Home = () => {
 
   return (
     <div>
+      <Header/>
       <h2>Home</h2>
       {user ? (
         <div>

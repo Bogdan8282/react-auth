@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "../utils/axios";
 import { useNavigate } from "react-router-dom";
+import Header from "./Header.jsx";
 
 const Register = () => {
   const [name, setName] = useState("");
@@ -20,6 +21,7 @@ const Register = () => {
 
   return (
     <div>
+      <Header />
       <h2>Register</h2>
       <form onSubmit={handleRegister}>
         <input

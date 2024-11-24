@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "../utils/axios";
 import { useNavigate } from "react-router-dom";
+import Header from "./Header.jsx";
 
 const Login = () => {
   const [name, setName] = useState("");
@@ -20,6 +21,7 @@ const Login = () => {
 
   return (
     <div>
+      <Header />
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input
